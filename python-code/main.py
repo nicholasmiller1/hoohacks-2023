@@ -2,7 +2,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
-import plotly.express as px
+#import plotly.express as px
 
 # load xyz file data and then read it into a 2d table (N x 6) of the XYZRGB points of 3d model
 data_folder = "data/"
