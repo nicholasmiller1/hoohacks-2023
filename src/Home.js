@@ -1,4 +1,5 @@
 import React from 'react';
+import AnnotationForm from './components/AnnotationForm';
 import "./styles/Home.css";
 
 function Home() {
@@ -13,6 +14,7 @@ function Home() {
           title="echo3D WebAR iframe element">
         </iframe>
       </div>
+      <AnnotationForm />
     </div>
   );
 }
