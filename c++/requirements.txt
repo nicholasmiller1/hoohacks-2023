@@ -1,0 +1,2 @@
+// cgal requirements for doing Efficient RANSAC plane detection
+sudo apt-get install libcgal-dev
