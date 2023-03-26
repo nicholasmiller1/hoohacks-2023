@@ -1,7 +1,7 @@
 import React from 'react';
 import AnnotationForm from './components/AnnotationForm';
 import "./styles/Home.css";
-import UploadForm from './UploadForm';
+import UploadForm from './components/UploadForm';
 import { useState } from 'react';
 
 function Home() {
@@ -15,7 +15,7 @@ function Home() {
           <UploadForm setEntityLink={setEntityLink} setEntityID={setEntityID} />
         </div>
       }
-      {entityID !== undefined &&
+      {entityID !== undefined && entityLink !== undefined &&
         <div className="model-display">
           <h1>GUIDEROOM Test File</h1>
           <iframe id="model-view" src={entityLink} title="echo3D WebAR iframe element" />

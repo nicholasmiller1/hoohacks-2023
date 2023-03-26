@@ -28,9 +28,9 @@ const UploadForm = ({ setEntityLink, setEntityID }) => {
 
     return (
         <div className="upload-form">
-            <h1>Upload a 3D File: .xyz, .fbx, .obj, .gbl</h1>
+            <h1>Upload a .glb File</h1>
             <form encType="multipart/form-data" id="upload-form" onSubmit={submitUploadRequest}>
-                <input className="btn btn-primary mb-3 mx-3" type="file" name="file_model" accept=".xyz, .fbx, .obj, .gbl" onChange={(event) => setUploadFile(event.target.files[0])} />
+                <input className="btn btn-primary mb-3 mx-3" type="file" name="file_model" accept=".glb" onChange={(event) => setUploadFile(event.target.files[0])} />
                 <input className="btn btn-primary mb-3 mx-3" type="submit" />
             </form>
         </div>
