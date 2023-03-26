@@ -26,10 +26,11 @@ if __name__ == "__main__":
 
   # Read the point cloud data
   data_folder="data/"
-  dataset="desk.xyz"
+  dataset="stairs.glb"
   #pcd = np.loadtxt(data_folder+dataset,skiprows=1)
-  pcd = o3d.io.read_point_cloud(data_folder+dataset)
-  # o3d.visualization.draw_geometries([pcd])
+  mesh = o3d.io.read_triangle_mesh(data_folder+dataset)
+  pcd = mesh.sample_points_poisson_disk(number_of_points=10000, init_factor=5)
+  o3d.visualization.draw_geometries([pcd])
 
   # pcd = pcd.voxel_down_sample(voxel_size=0.015)
 
