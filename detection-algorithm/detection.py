@@ -18,20 +18,21 @@ from scipy.spatial import Delaunay
 HORIZONTAL_Y_PROJECTION_THRESHOLD = 0.87
 RAMP_Y_PROJECTION_THRESHOLD = 0.5
 HORIZONTAL_POINT_THRESHOLD = 170
-RAMP_POINT_THRESHOLD = 100
 
-if __name__ == "__main__":
+def run_detection(file):
   # ====================================================== #
   # ==== Code below obtained from: Florent Poux, Ph.D.==== #
   # ====================================================== #
   # There are slight modifications to the original code
 
   # Read the point cloud data
-  data_folder="data/"
-  dataset="table.xyz"
+  # data_folder="data/"
+  #dataset="table.glb"
   #pcd = np.loadtxt(data_folder+dataset,skiprows=1)
-  pcd = o3d.io.read_point_cloud(data_folder+dataset)
-  #o3d.visualization.draw_geometries([pcd])
+  mesh = o3d.io.read_triangle_mesh(file)
+  #mesh = o3d.io.read_triangle_mesh("data/"+dataset)
+  pcd = mesh.sample_points_poisson_disk(number_of_points=10000, init_factor=5)
+  o3d.visualization.draw_geometries([pcd])
 
   #pcd = pcd.voxel_down_sample(voxel_size=0.015)
 
@@ -122,8 +123,8 @@ if __name__ == "__main__":
   horizontal_segments = []
   bounding_boxes = []
   for segment in np.asarray(segments_lst)[horizontal_mask]:
-     print(segment)
-     if len(segment.points) > HORIZONTAL_POINT_THRESHOLD:
+      print(segment)
+      if len(segment.points) > HORIZONTAL_POINT_THRESHOLD:
         print("Segment accepted")
         _, filtered_indices = segment.remove_statistical_outlier(nb_neighbors=20, std_ratio=2.3)
         segment = segment.select_by_index(filtered_indices)
@@ -131,23 +132,16 @@ if __name__ == "__main__":
         horizontal_segments.append(segment)
         bounding_box = o3d.geometry.AxisAlignedBoundingBox.create_from_points(segment.points)
         bounding_box.color = [1,0,0]
-        bounding_boxes.append(bounding_box)
+        bounding_boxes.append(bounding_box)    
 
-  print("Normals of each segment: ", norms)
+  print("HORIZONTAL SEGMENTS: ", len(horizontal_segments))
+  o3d.visualization.draw_geometries(horizontal_segments + bounding_boxes)
+  o3d.visualization.draw_geometries(bounding_boxes)
 
-  o3d.visualization.draw_geometries(segments_lst)
 
-  print("HORIZONTAL SEGMENTS: ", sum(horizontal_mask))
-  horizontal_segments = np.asarray(segments_lst)[horizontal_mask]
-  o3d.visualization.draw_geometries(horizontal_segments)
+  print("RAMP SEGMENTS: ", sum(ramp_mask))
+  # o3d.visualization.draw_geometries(np.asarray(segments_lst)[ramp_mask])
 
-  #print("RAMP SEGMENTS: ", sum(ramp_mask))
-  #ramp_segments = np.asarray(segments_lst)[ramp_mask]
-  #o3d.visualization.draw_geometries(ramp_segments)
-
-  # All horizontal and ramp segments
-  #flat_segments = np.concatenate((horizontal_segments, ramp_segments))
-  #o3d.visualization.draw_geometries(flat_segments)
   flat_segments=horizontal_segments
 
   h_segments = []
@@ -170,21 +164,22 @@ if __name__ == "__main__":
   print(xz.shape)
   for i in range(1, len(non_floor_segments)):
     np.append(xz, non_floor_segments[i][:,[0,2]], axis=0)
-     
+      
   hull = Delaunay(xz)
   for i in range(len(floor)):
     floor_mask.append(hull.find_simplex(floor[i, [0,2]])<0)
 
   floor = floor[floor_mask]
-  
+
   floor_segment = o3d.geometry.PointCloud()
   floor_segment.points = o3d.utility.Vector3dVector(floor)
   o3d.visualization.draw_geometries([floor_segment])
+  return len(horizontal_segments)
 
-
-    
 
   
+
+
 
 
 
