@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 
-const UploadForm = ({ setEntityLink, setEntityID, setIsProcessing, setProcessingResults }) => {
+const UploadForm = ({ setEntityLink, setEntityID, setIsProcessing, setProcessingResults, processingResults }) => {
 
     const [uploadFile, setUploadFile] = useState(undefined);
     const [isUploading, setIsUploading] = useState(false);
@@ -32,7 +32,7 @@ const UploadForm = ({ setEntityLink, setEntityID, setIsProcessing, setProcessing
               setEntityLink(response['additionalData']['shortURL']);
               setEntityID(response['id']);
           });
-
+          
         // POST to Python WebServer
         const webServerUrl = 'http://localhost:5000/processing';
         const webServerFormData = new FormData();
