@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
   # Read the point cloud data
   data_folder="data/"
-  dataset="desk.xyz"
+  dataset="stairs.xyz"
   #pcd = np.loadtxt(data_folder+dataset,skiprows=1)
   pcd = o3d.io.read_point_cloud(data_folder+dataset)
   pcd = pcd.voxel_down_sample(voxel_size=0.015)
@@ -88,7 +88,6 @@ if __name__ == "__main__":
   rest.colors = o3d.utility.Vector3dVector(colors[:, :3])
 
   segments_lst = [segments[i] for i in range(max_plane_idx)]
-  #o3d.visualization.draw_geometries(segments_lst)
   #o3d.visualization.draw_geometries([segments[i] for i in range(max_plane_idx)]+[rest])
   #o3d.visualization.draw_geometries([segments[i] for i in range(max_plane_idx)]+[rest], zoom=0.3199,front=[0,0,0],lookat=[0,0,0],up=[0,0,1])
   #o3d.visualization.draw_geometries([rest])
@@ -107,13 +106,28 @@ if __name__ == "__main__":
     horizontal_mask.append(norms[i]>=HORIZONTAL_Z_PROJECTION_THRESHOLD)
     ramp_mask.append(RAMP_Z_PROJECTION_THRESHOLD<=norms[i]<HORIZONTAL_Z_PROJECTION_THRESHOLD)
   
+  coord = o3d.geometry.TriangleMesh().create_coordinate_frame()
+  
   print("Normals of each segment: ", norms)
 
+  o3d.visualization.draw_geometries(segments_lst + [coord], zoom=1, up=[0,1,0])
+
   print("HORIZONTAL SEGMENTS: ", sum(horizontal_mask))
-  o3d.visualization.draw_geometries(np.asarray(segments_lst)[horizontal_mask])
+  horizontal_segments = np.asarray(segments_lst)[horizontal_mask]
+  o3d.visualization.draw_geometries(horizontal_segments, up=[0,1,0])
 
   print("RAMP SEGMENTS: ", sum(ramp_mask))
-  o3d.visualization.draw_geometries(np.asarray(segments_lst)[ramp_mask])
+  ramp_segments = np.asarray(segments_lst)[ramp_mask]
+  o3d.visualization.draw_geometries(ramp_segments, up=[0,1,0])
+
+  floor_segments = o3d.geometry.PointCloud()
+  for s in horizontal_segments:
+    floor_segments += s
+  for s in ramp_segments:
+    floor_segments += s
+  #floor_segments.paint_uniform_color([0.5, 0.5, 0.5])
+  o3d.visualization.draw_geometries([floor_segments], point_show_normal=True)
+     
 
 
 
