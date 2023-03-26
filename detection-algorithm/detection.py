@@ -285,7 +285,11 @@ def run_detection(file):
     o3d.visualization.draw_geometries([floor_segment] + [bounding_box] + [line_set])
 
 
-    return len(bounding_boxes)
+    d = {
+      "number_of_staircases: " : len(bounding_boxes),
+      "number_of_space_violations" : violation_ct/2
+    }
+    return d
 
 # if __name__ == '__main__':
 #    run_detection('data/two_stairs.glb')
