@@ -1,3 +1,6 @@
 numpy
 matplotlib
 plotly
+pandas
+math
+open3d
