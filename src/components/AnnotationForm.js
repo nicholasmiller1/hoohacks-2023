@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 
 const AnnotationForm = () => {
+  const [currentAnnotation, setCurrentAnnotation] = useState(1);
   const [annotationContent, setAnnotationContent] = useState('');
   const [annotationPosition, setAnnotationPosition] = useState('');
 
@@ -14,11 +15,13 @@ const AnnotationForm = () => {
   function addAnnotation(event) {
     event.preventDefault();
 
-    submitAnnotationRequest('annotation1_content', annotationContent);
-    submitAnnotationRequest('annotation1_position', annotationPosition);
-    submitAnnotationRequest('annotation1_normal', "0,0,0");
+    submitAnnotationRequest(`annotation${currentAnnotation}_content`, annotationContent);
+    submitAnnotationRequest(`annotation${currentAnnotation}_position`, annotationPosition);
+    submitAnnotationRequest(`annotation${currentAnnotation}_normal`, "0,0,0");
 
-    console.log(`Created annotation ${annotationContent} at ${annotationPosition}`);
+    console.log(`Created annotation ${currentAnnotation} with text ${annotationContent} at ${annotationPosition}`);
+
+    setCurrentAnnotation(currentAnnotation + 1);
   }
 
   return (
