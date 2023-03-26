@@ -1,0 +1,8 @@
+numpy
+matplotlib
+plotly
+pandas
+open3d
+scikit-learn
+flask
+flask-cors
