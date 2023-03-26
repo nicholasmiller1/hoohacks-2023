@@ -97,8 +97,10 @@ if __name__ == "__main__":
   for i in range(max_plane_idx):
     segments_lst[i].estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
     # Calculate z-value projections and get the average z-value projection over entire segments
-    norms.append(np.mean(np.abs(np.asarray(pcd.normals)[:, 2])))
+    norms.append(np.mean(np.abs(np.asarray(segments_lst[i].normals)[:, 2])))
   
   o3d.visualization.draw_geometries(segments_lst)
   print("Normals of each segment: ", norms)
+
+  
 
