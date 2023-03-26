@@ -12,11 +12,49 @@ from sklearn import linear_model
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import open3d as o3d
+import itertools
 
 
 HORIZONTAL_Y_PROJECTION_THRESHOLD = 0.87
 RAMP_Y_PROJECTION_THRESHOLD = 0.5
-HORIZONTAL_POINT_THRESHOLD = 170
+HORIZONTAL_POINT_THRESHOLD = 100
+
+RECTANGLE_COMPARISON_THESHOLD = 0.1
+
+def compare_rectangles(rectangles):
+  widths = []
+  heights = []
+  for rectangle in rectangles:
+    extent = rectangle.get_extent()
+    widths.append(extent[0])
+    heights.append(extent[1])
+
+  median_width = np.median(widths)
+  median_height = np.median(heights)
+
+  filtered_rectangles = []
+  for i in range(len(rectangles)):
+     if np.abs(widths[i] - median_width) < RECTANGLE_COMPARISON_THESHOLD and np.abs(heights[i] - median_height) < RECTANGLE_COMPARISON_THESHOLD:
+        filtered_rectangles.append(rectangles[i])
+
+  return filtered_rectangles
+
+def detect_stairs(horizontal_boxes):
+  box_areas = []
+  for box in horizontal_boxes:
+    extent = box.get_extent()
+    box_areas.append([box, extent[0] * extent[2]])
+
+  box_groups = [list(group) for _, group in itertools.groupby(box_areas, lambda area: round(area[1]))]
+
+  filtered_boxes = []
+  for group in box_groups:
+     if len(group) > 1:
+        boxes = [item[0] for item in group]
+        filtered_boxes.append(compare_rectangles(boxes))
+
+  print(filtered_boxes)
+  return filtered_boxes
 
 def run_detection(file):
   # ====================================================== #
@@ -111,10 +149,11 @@ def run_detection(file):
     horizontal_mask.append(norms[i]>=HORIZONTAL_Y_PROJECTION_THRESHOLD)
     ramp_mask.append(RAMP_Y_PROJECTION_THRESHOLD<=norms[i]<HORIZONTAL_Y_PROJECTION_THRESHOLD)
 
-  # o3d.visualization.draw_geometries(segments_lst)
+  o3d.visualization.draw_geometries(segments_lst)
 
   print("Normals of each segment: ", norms)
 
+  o3d.visualization.draw_geometries(np.asarray(segments_lst)[horizontal_mask])
 
   horizontal_segments = []
   bounding_boxes = []
@@ -124,7 +163,6 @@ def run_detection(file):
         print("Segment accepted")
         _, filtered_indices = segment.remove_statistical_outlier(nb_neighbors=20, std_ratio=2.3)
         segment = segment.select_by_index(filtered_indices)
-        # print(filtered_segment)
         horizontal_segments.append(segment)
         bounding_box = o3d.geometry.AxisAlignedBoundingBox.create_from_points(segment.points)
         bounding_box.color = [1,0,0]
@@ -134,14 +172,17 @@ def run_detection(file):
 
   print("HORIZONTAL SEGMENTS: ", len(horizontal_segments))
   o3d.visualization.draw_geometries(horizontal_segments + bounding_boxes)
-  o3d.visualization.draw_geometries(bounding_boxes)
-
+  
+  bounding_boxes = detect_stairs(bounding_boxes)
+  o3d.visualization.draw_geometries([box for group in bounding_boxes for box in group])
 
   print("RAMP SEGMENTS: ", sum(ramp_mask))
   # o3d.visualization.draw_geometries(np.asarray(segments_lst)[ramp_mask])
 
-  return len(horizontal_segments)
+  print(len(bounding_boxes))
+  return len(bounding_boxes)
 
 
-
+# if __name__ == '__main__':
+#    run_detection('data/two_stairs.glb')
 
