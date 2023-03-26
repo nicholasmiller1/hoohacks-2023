@@ -1,6 +1,6 @@
 # Virtual environment
-python-code/venv/
-python-code/.venv/
+*/venv/
+*/.venv/
 
 # dependencies
 /node_modules

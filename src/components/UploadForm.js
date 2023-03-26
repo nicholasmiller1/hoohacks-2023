@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 
-const UploadForm = ({ setEntityLink, setEntityID }) => {
+const UploadForm = ({ setEntityLink, setEntityID, setProcessingResults }) => {
 
     const [uploadFile, setUploadFile] = useState(undefined);
 
@@ -9,6 +9,8 @@ const UploadForm = ({ setEntityLink, setEntityID }) => {
 
     function submitUploadRequest(event) {
         event.preventDefault();
+
+        // POST to Echo3D
         const postUrl = `https://api.echo3D.com/upload`;
         const formData = new FormData();
         formData.append('key', process.env.REACT_APP_ECHO_3D_API_KEY);
@@ -18,12 +20,28 @@ const UploadForm = ({ setEntityLink, setEntityID }) => {
         formData.append('type', 'upload');
         formData.append('file_model', uploadFile);
         formData.append('secKey', process.env.REACT_APP_ECHO_3D_SECURITY_KEY);
-        fetch(postUrl, { method: 'POST', header: { 'Content-Type': 'multipart/form-data' }, body: formData })
-            .then((response) => response.json())
-            .then(response => {
-                setEntityLink(response['additionalData']['shortURL']);
-                setEntityID(response['id']);
-            });
+        fetch(postUrl, {
+          method: 'POST',
+          header: { 'Content-Type': 'multipart/form-data' },
+          body: formData
+        })
+          .then((response) => response.json())
+          .then(response => {
+              setEntityLink(response['additionalData']['shortURL']);
+              setEntityID(response['id']);
+          });
+
+        // POST to Python WebServer
+        const webServerUrl = 'http://localhost:5000/processing';
+        const webServerFormData = new FormData();
+        webServerFormData.append('file_model', uploadFile);
+        fetch(webServerUrl, {
+          method: 'POST',
+          header: { 'Content-Type': 'multipart/form-data' },
+          body: webServerFormData
+        })
+          .then(response => response.text())
+          .then(response => setProcessingResults(response));
     }
 
     return (

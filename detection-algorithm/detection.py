@@ -18,17 +18,17 @@ HORIZONTAL_Y_PROJECTION_THRESHOLD = 0.87
 RAMP_Y_PROJECTION_THRESHOLD = 0.5
 HORIZONTAL_POINT_THRESHOLD = 170
 
-if __name__ == "__main__":
+def run_detection(file):
   # ====================================================== #
   # ==== Code below obtained from: Florent Poux, Ph.D.==== #
   # ====================================================== #
   # There are slight modifications to the original code
 
   # Read the point cloud data
-  data_folder="data/"
-  dataset="stairs.glb"
+  # data_folder="data/"
+  # dataset="stairs.glb"
   #pcd = np.loadtxt(data_folder+dataset,skiprows=1)
-  mesh = o3d.io.read_triangle_mesh(data_folder+dataset)
+  mesh = o3d.io.read_triangle_mesh(file)
   pcd = mesh.sample_points_poisson_disk(number_of_points=10000, init_factor=5)
   o3d.visualization.draw_geometries([pcd])
 
@@ -139,6 +139,8 @@ if __name__ == "__main__":
 
   print("RAMP SEGMENTS: ", sum(ramp_mask))
   # o3d.visualization.draw_geometries(np.asarray(segments_lst)[ramp_mask])
+
+  return len(horizontal_segments)
 
 
 
