@@ -14,8 +14,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import open3d as o3d
 
 
-HORIZONTAL_Z_PROJECTION_THRESHOLD = 0.87
-RAMP_Z_PROJECTION_THRESHOLD = 0.5
+HORIZONTAL_Y_PROJECTION_THRESHOLD = 0.87
+RAMP_Y_PROJECTION_THRESHOLD = 0.5
 
 if __name__ == "__main__":
   # ====================================================== #
@@ -25,10 +25,12 @@ if __name__ == "__main__":
 
   # Read the point cloud data
   data_folder="data/"
-  dataset="desk.xyz"
+  dataset="stairs.xyz"
   #pcd = np.loadtxt(data_folder+dataset,skiprows=1)
   pcd = o3d.io.read_point_cloud(data_folder+dataset)
-  pcd = pcd.voxel_down_sample(voxel_size=0.015)
+  o3d.visualization.draw_geometries([pcd])
+
+  # pcd = pcd.voxel_down_sample(voxel_size=0.015)
 
   pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=16), fast_normal_computation=True)
   pcd.paint_uniform_color([0.6, 0.6, 0.6])
@@ -88,7 +90,7 @@ if __name__ == "__main__":
   rest.colors = o3d.utility.Vector3dVector(colors[:, :3])
 
   segments_lst = [segments[i] for i in range(max_plane_idx)]
-  #o3d.visualization.draw_geometries(segments_lst)
+  # o3d.visualization.draw_geometries(segments_lst)
   #o3d.visualization.draw_geometries([segments[i] for i in range(max_plane_idx)]+[rest])
   #o3d.visualization.draw_geometries([segments[i] for i in range(max_plane_idx)]+[rest], zoom=0.3199,front=[0,0,0],lookat=[0,0,0],up=[0,0,1])
   #o3d.visualization.draw_geometries([rest])
@@ -103,10 +105,12 @@ if __name__ == "__main__":
   for i in range(max_plane_idx):
     segments_lst[i].estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
     # Calculate z-value projections and get the average z-value projection over entire segments
-    norms.append(np.mean(np.abs(np.asarray(segments_lst[i].normals)[:, 2])))
-    horizontal_mask.append(norms[i]>=HORIZONTAL_Z_PROJECTION_THRESHOLD)
-    ramp_mask.append(RAMP_Z_PROJECTION_THRESHOLD<=norms[i]<HORIZONTAL_Z_PROJECTION_THRESHOLD)
-  
+    norms.append(np.mean(np.abs(np.asarray(segments_lst[i].normals)[:, 1])))
+    horizontal_mask.append(norms[i]>=HORIZONTAL_Y_PROJECTION_THRESHOLD)
+    ramp_mask.append(RAMP_Y_PROJECTION_THRESHOLD<=norms[i]<HORIZONTAL_Y_PROJECTION_THRESHOLD)
+
+  o3d.visualization.draw_geometries(segments_lst)
+
   print("Normals of each segment: ", norms)
 
   print("HORIZONTAL SEGMENTS: ", sum(horizontal_mask))
