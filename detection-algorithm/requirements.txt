@@ -4,6 +4,7 @@ plotly
 pandas
 open3d
 scikit-learn
+scipy
 flask
 flask-cors
 gunicorn
