@@ -1,14 +1,16 @@
 import React from 'react';
 import { useState } from 'react';
 
-const UploadForm = ({ setEntityLink, setEntityID, setProcessingResults }) => {
+const UploadForm = ({ setEntityLink, setEntityID, setIsProcessing, setProcessingResults, processingResults }) => {
 
     const [uploadFile, setUploadFile] = useState(undefined);
+    const [isUploading, setIsUploading] = useState(false);
 
     //pass state to component, move state to home - modify state of parent componenet
 
     function submitUploadRequest(event) {
         event.preventDefault();
+        setIsUploading(true);
 
         // POST to Echo3D
         const postUrl = `https://api.echo3D.com/upload`;
@@ -32,6 +34,7 @@ const UploadForm = ({ setEntityLink, setEntityID, setProcessingResults }) => {
           });
 
         // POST to Python WebServer
+        // const webServerUrl = 'https://guideroom-webserver.onrender.com/processing';
         const webServerUrl = 'http://localhost:5000/processing';
         const webServerFormData = new FormData();
         webServerFormData.append('file_model', uploadFile);
@@ -45,12 +48,19 @@ const UploadForm = ({ setEntityLink, setEntityID, setProcessingResults }) => {
     }
 
     return (
-        <div className="upload-form">
-            <h1>Upload a .glb File</h1>
-            <form encType="multipart/form-data" id="upload-form" onSubmit={submitUploadRequest}>
-                <input className="btn btn-primary mb-3 mx-3" type="file" name="file_model" accept=".glb" onChange={(event) => setUploadFile(event.target.files[0])} />
-                <input className="btn btn-primary mb-3 mx-3" type="submit" />
-            </form>
+        <div className="upload-form-container">
+            <h3>UPLOAD</h3>
+            <h6 id="upload-instr">Upload a .glb files only</h6>
+
+            {isUploading ? (
+                <div className="spinner"></div>
+            ) : (
+                <form encType="multipart/form-data" id="upload-form" onSubmit={submitUploadRequest}>
+                    <input className="file-chooser btn btn-outline-dark mb-3 mx-3" type="file" name="file_model" accept=".glb" onChange={(event) => setUploadFile(event.target.files[0])} />
+                    <input className="btn btn-dark mb-3 mx-3" type="submit" />
+                </form>
+            )}
+
         </div>
     );
 
