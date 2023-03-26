@@ -16,6 +16,7 @@ import open3d as o3d
 
 HORIZONTAL_Y_PROJECTION_THRESHOLD = 0.87
 RAMP_Y_PROJECTION_THRESHOLD = 0.5
+HORIZONTAL_POINT_THRESHOLD = 170
 
 if __name__ == "__main__":
   # ====================================================== #
@@ -25,10 +26,10 @@ if __name__ == "__main__":
 
   # Read the point cloud data
   data_folder="data/"
-  dataset="stairs.xyz"
+  dataset="desk.xyz"
   #pcd = np.loadtxt(data_folder+dataset,skiprows=1)
   pcd = o3d.io.read_point_cloud(data_folder+dataset)
-  o3d.visualization.draw_geometries([pcd])
+  # o3d.visualization.draw_geometries([pcd])
 
   # pcd = pcd.voxel_down_sample(voxel_size=0.015)
 
@@ -109,15 +110,34 @@ if __name__ == "__main__":
     horizontal_mask.append(norms[i]>=HORIZONTAL_Y_PROJECTION_THRESHOLD)
     ramp_mask.append(RAMP_Y_PROJECTION_THRESHOLD<=norms[i]<HORIZONTAL_Y_PROJECTION_THRESHOLD)
 
-  o3d.visualization.draw_geometries(segments_lst)
+  # o3d.visualization.draw_geometries(segments_lst)
 
   print("Normals of each segment: ", norms)
 
-  print("HORIZONTAL SEGMENTS: ", sum(horizontal_mask))
-  o3d.visualization.draw_geometries(np.asarray(segments_lst)[horizontal_mask])
+
+  horizontal_segments = []
+  bounding_boxes = []
+  for segment in np.asarray(segments_lst)[horizontal_mask]:
+     print(segment)
+     if len(segment.points) > HORIZONTAL_POINT_THRESHOLD:
+        print("Segment accepted")
+        _, filtered_indices = segment.remove_statistical_outlier(nb_neighbors=20, std_ratio=2.3)
+        segment = segment.select_by_index(filtered_indices)
+        # print(filtered_segment)
+        horizontal_segments.append(segment)
+        bounding_box = o3d.geometry.AxisAlignedBoundingBox.create_from_points(segment.points)
+        bounding_box.color = [1,0,0]
+        bounding_boxes.append(bounding_box)
+
+     
+
+  print("HORIZONTAL SEGMENTS: ", len(horizontal_segments))
+  o3d.visualization.draw_geometries(horizontal_segments + bounding_boxes)
+  o3d.visualization.draw_geometries(bounding_boxes)
+
 
   print("RAMP SEGMENTS: ", sum(ramp_mask))
-  o3d.visualization.draw_geometries(np.asarray(segments_lst)[ramp_mask])
+  # o3d.visualization.draw_geometries(np.asarray(segments_lst)[ramp_mask])
 
 
 
