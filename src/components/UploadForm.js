@@ -1,11 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 
-<<<<<<< HEAD
-const UploadForm = ({ setEntityLink, setEntityID, setIsProcessing }) => {
-=======
-const UploadForm = ({ setEntityLink, setEntityID, setProcessingResults }) => {
->>>>>>> 60e3bbd (Integrated python and react)
+const UploadForm = ({ setEntityLink, setEntityID, setIsProcessing, setProcessingResults }) => {
 
     const [uploadFile, setUploadFile] = useState(undefined);
     const [isUploading, setIsUploading] = useState(false);
@@ -14,12 +10,9 @@ const UploadForm = ({ setEntityLink, setEntityID, setProcessingResults }) => {
 
     function submitUploadRequest(event) {
         event.preventDefault();
-<<<<<<< HEAD
         setIsUploading(true);
-=======
 
         // POST to Echo3D
->>>>>>> 60e3bbd (Integrated python and react)
         const postUrl = `https://api.echo3D.com/upload`;
         const formData = new FormData();
         formData.append('key', process.env.REACT_APP_ECHO_3D_API_KEY);
