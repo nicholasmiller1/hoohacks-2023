@@ -32,7 +32,7 @@ const UploadForm = ({ setEntityLink, setEntityID, setProcessingResults }) => {
           });
 
         // POST to Python WebServer
-        const webServerUrl = 'http://localhost:5000/processing';
+        const webServerUrl = 'https://guideroom-webserver.onrender.com/processing';
         const webServerFormData = new FormData();
         webServerFormData.append('file_model', uploadFile);
         fetch(webServerUrl, {
